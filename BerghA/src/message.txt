@@ -1,0 +1,110 @@
+using Oscar
+using Combinatorics
+
+function slicematrix(A)
+    return [A[i, :] for i in 1:size(A,1)]
+end
+
+function rowMinors(A,S)
+    outList=[]
+    slices=slicematrix(A)
+    for i in 1:size(slices,1)
+        if i in S
+            append!(outList,[slices[i]])
+        end
+    end
+    return transpose(hcat(outList...))
+end
+
+function convertIncidenceMatrix(A)
+    A=Array(A)
+    dim1=size(A,1)
+    dim2=size(A,2)
+    out=[]
+    for i in 1:dim1
+        members=[]
+        for j in 1:dim2
+            if A[i,j]==true
+                append!(members,j)
+            end
+        end
+        append!(out,[members])
+    end
+    return out
+end
+    
+    
+    
+function coneListFormat(coneList)
+    memberList=[]
+    denseList=slicematrix(coneList)
+    for row in denseList
+        members=[]
+        for i in 1:size(row,1)
+            if row[i]==1
+                append!(members,i)
+            end
+        end
+        append!(memberList,[members])
+    end
+    return memberList
+end
+ 
+function makeSmooth(X)
+    Y  = copy(X)
+    while(true)
+        coneList = convertIncidenceMatrix(Y.MAXIMAL_CONES)
+        rayMatrix = Array(Y.RAYS)
+        k = 1
+        for coneSet in coneList
+            S=size(coneSet)[1]
+            coneRays=rowMinors(rayMatrix,coneSet)
+            R=rank(coneRays)
+            smoothCheck=Polymake.fan.check_fan_objects(Polymake.polytope.Cone(RAYS=coneRays)).SMOOTH_FAN
+            if R != S || !smoothCheck
+                break
+            else
+                k+=1
+            end
+        end
+        if k == size(coneList,1)+1
+            break
+        end
+        sigma=coneList[k]
+        sigmaRays=slicematrix(rowMinors(rayMatrix,sigma))
+        tau=0; tauRays=0; tauCone=0
+        for subset in collect(powerset(sigma))
+            if size(subset,1) > 1
+                S=size(subset)[1]
+                subsetRays=rowMinors(rayMatrix,subset)
+                R=rank(subsetRays)
+                subsetCone=Polymake.polytope.Cone(RAYS=subsetRays)
+                smoothCheck=Polymake.fan.check_fan_objects(subsetCone).SMOOTH_FAN
+                if R != S || !smoothCheck
+                    tau=subset
+                    tauRays=subsetRays
+                    tauCone=subsetCone
+                    break
+                end 
+            end
+        end
+        H=slicematrix(Matrix(tauCone.HILBERT_BASIS_GENERATORS[1]))
+        rayIndex=0
+        print(sigmaRays)
+        for i in 1:size(H,1)
+            if !(H[i] in sigmaRays)
+                rayIndex=i
+                break
+            end
+        end
+        if rayIndex==0
+            print("need to make simplicial")
+            break
+        else
+            blowupRay=H[rayIndex]
+            print("need to blow up at ")
+            print(blowupRay)
+            break
+        end
+    end
+end
