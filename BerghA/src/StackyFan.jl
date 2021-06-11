@@ -4,6 +4,7 @@ using InvertedIndices
 using Combinatorics
 using LinearAlgebra
 export addStackStructure
+export stackyWeights
 
 """
 
