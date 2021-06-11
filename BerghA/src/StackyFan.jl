@@ -3,6 +3,7 @@ using Polymake
 using InvertedIndices
 using Combinatorics
 using LinearAlgebra
+export addStackStructure
 
 """
 
