@@ -1,4 +1,4 @@
-name = "BerghA"
+name = "BerghAlgorithms"
 uuid = "f2fac6c4-9609-4442-bbda-8eba9356dd10"
 authors = ["Henry Talbott", "Dhruv Bhatia", "Daniel Li", "Dan Abramovich", "Stephen Obinna", "Lars Kastner", "Chen Li", "Nada Benabla"]
 version = "0.1.0"

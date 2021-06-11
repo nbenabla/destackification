@@ -1,11 +1,11 @@
-module BerghA
+module BerghAlgorithms
 include("StackyFan.jl")
-export BerghAEfficient
+export BerghA
 
 # Write your package code here.
 """
 
-    BerghAEfficient(F::StackyFan,D::Array{Int64,1})
+    BerghA(F::StackyFan,D::Array{Int64,1})
 
     Given a stacky fan F and a vector of booleans D representing the distinguished structure,
     returns a smooth stacky fan where the distinguished rays are independent.
@@ -13,7 +13,7 @@ export BerghAEfficient
     
 """
 
-function BerghAEfficient(F::StackyFan,D::Array{Int64,1};verbose::Bool=false)
+function BerghA(F::StackyFan,D::Array{Int64,1};verbose::Bool=false)
     if verbose==true
         println("==algorithm is running in verbose mode==")
         println(" ")
@@ -98,7 +98,7 @@ function BerghAEfficient(F::StackyFan,D::Array{Int64,1};verbose::Bool=false)
             push!(P,stackyPoint)
         end
         
-        #A2 - find element of P such that the sum of the entries is minimal.
+        #A2 - find element of P such that the sum of the coefficients corresponding to distinguished rays is minimal.
             #This invariant does not produce a unique ray, so there is a degree of arbitrary selection.
         psi=minimalByDist(P,D)
         #if verbose==true
