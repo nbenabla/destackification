@@ -40,3 +40,44 @@ end
 #         F=addStackStructure(X,[1,1])
 #         @test stackyWeights(BerghA(F,[1,0])) == [ 609 ,  29 ,  1 ,  174 ,  29 ,  1740 ,  1218 ,  58 ,  145 ,  1044 ,  1044 ,  290 ,  290 ,  145 ,  406 ,  348 ,  261 ,  14616 ,  14616 ,  609 ,  3480 ,  870 ,  609 ,  174 ,  609 ,  9744 ,  14616 ,  1218 ,  58 ,  145 ,  435 ,  725 ,  1305 ,  1740 ,  6960 ,  3480 ,  870 ,  3480 ,  58464 ,  6090 ,  3480 ,  1392 ,  696 ,  1044 ,  2088 ,  261 ,  174 ,  261 ,  609 ,  406 ,  609 ,  609 ,  406 ,  609 ,  1218 ,  812 ,  1218 ,  2088 ,  261 ,  1044 ,  1160 ,  1740 ,  1740 ,  870 ,  1305 ,  1305 ,  14616 ,  10440 ,  145 ,  435 ,  609 ,  116 ,  580 ,  290 ,  580 ,  1740 ,  3480 ,  3480 ,  261 ,  522 ,  261 ,  522 ,  522 ,  1218 ,  1218 ,  1218 ,  1218 ,  2436 ,  2436 ,  4176 ,  2088 ,  3480 ,  2610 ,  29232 ,  6090 ,  1218 ,  290 ,  145 ,  290 ,  12180 ,  261 ,  522 ]
 # end
+
+
+@testset "makeSmooth tests" begin
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[4 -1; 0 1],INPUT_CONES=[[0, 1]])
+    @test X.SMOOTH_FAN == false
+    @test makeSmooth(X).SMOOTH_FAN == true
+    @test makeSmooth(X).INPUT_RAYS == [1 -1/4; 0 1; 1 0]
+    
+
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0;1 1 0;1 0 1;1 1 1],INPUT_CONES=[[0,1,2,3]])
+    @test X.SIMPLICIAL == false
+    @test X.SMOOTH_FAN == false
+    @test makeSmooth(X).SMOOTH_FAN == true
+    
+    # This test fails, the last ray is given as 4 2 2
+    @test makeSmooth(X).INPUT_RAYS == [1 0 0;1 1 0;1 0 1;1 1 1;2 1 1]
+    @test makeSmooth(X).SIMPLICIAL == true
+    
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0 0;0 1 0 0;0 0 1 0;1 -1 1 0;1 0 -2 0],INPUT_CONES=[[0,1,2,3],[0,4]])
+    @test X.SIMPLICIAL == false
+    @test X.SMOOTH_FAN == false
+    @test makeSmooth(X).SMOOTH_FAN == true
+    @test makeSmooth(X).SIMPLICIAL == true
+
+    
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 2 3;-1 1 1;1 -1 1;-1 -1 1;1 1 -1;-1 1 -1;1 -1 -1;-1 -1 -1],INPUT_CONES=[[0,1,2,3],[0,1,4,5],[0,2,4,6],[1,3,5,7],[2,3,6,7],[4,5,6,7]])
+    @test X.SIMPLICIAL == false
+    @test X.SMOOTH_FAN == false
+    @test makeSmooth(X).SMOOTH_FAN == true
+    @test makeSmooth(X).SIMPLICIAL == true
+    
+#     This test is really slow
+#     X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0;0 1 0;0 0 1;0 -1 -1; -1 0 -1; -2 -1 0],INPUT_CONES=[[0,1,2],[0,1,3],[1,3,4],[1,2,4],[2,4,5],[0,2,5],[0,3,5],[3,4,5]])
+#     @test X.SIMPLICIAL == true
+#     @test X.SMOOTH_FAN == false
+#     @test makeSmooth(X).SMOOTH_FAN == true
+#     @test makeSmooth(X).SIMPLICIAL == true
+
+    
+end
+
