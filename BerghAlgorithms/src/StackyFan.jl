@@ -109,16 +109,8 @@ function stackyWeights(sf::StackyFan)
     rayList=slicematrix(rayMatrix)
     out=Int64[]
     for ray in rayList
-        try
-            stack=sf.stacks[encode(ray)]
-            push!(out,stack)
-        catch e
-            println("ERROR!!!")
-            println(e)
-            println(rayMatrix)
-            println(ray)
-            error("Ray matrix value reassignment issue encountered.")
-        end
+        stack=sf.stacks[encode(ray)]
+        push!(out,stack)
     end
     return out
 end
@@ -302,6 +294,7 @@ function findBarycenter(s::Union{AbstractSet,AbstractVector},X::Polymake.BigObje
     for i in 1:size(rays,1)
         bary+=rays[i,:]
     end
+    bary=Polymake.common.primitive(transpose(bary))
     return vec(bary)
 end
 
