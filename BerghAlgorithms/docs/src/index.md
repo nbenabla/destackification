@@ -10,8 +10,71 @@ This package implements toric stacky fans in Julia by extending the Oscar/Polyma
 - Visualization of stacky fans in two and three dimensions.
 - ???
 
-## Main Functions
+## Main Functions for Fans
+```@docs
+BerghAlgorithms.toric_blowup
+BerghAlgorithms.makeSimplicial
+BerghAlgorithms.makeSmooth
+BerghAlgorithms.starSubdivision
+```
+
+## Main Functions for Stacky Fans
 ```@docs
 BerghA
+BerghAlgorithms.stackyBlowup
+```
+
+## Main Visualization Functions
+```@docs
+BerghAlgorithms.showFan
+BerghAlgorithms.showStackyFan
+```
+
+## Helper Functions for Fans
+```@docs
+BerghAlgorithms.findBarycenter
+BerghAlgorithms.convertBool
+BerghAlgorithms.getConeRank
+BerghAlgorithms.getDimension
+BerghAlgorithms.getConeFaces
 BerghAlgorithms.slicematrix
+BerghAlgorithms.rowMinors
+BerghAlgorithms.convertIncidenceMatrix
+BerghAlgorithms.coneMultiplicity
+BerghAlgorithms.coneConvert
+BerghAlgorithms.getCones
+BerghAlgorithms.findFaceContainingRay
+BerghAlgorithms.findMinimalCone
+BerghAlgorithms.convertToIncidence
+BerghAlgorithms.interiorPoints
+```
+
+## Helper Functions for Stacky Fans
+```@docs
+BerghAlgorithms.addStackStructure
+BerghAlgorithms.encode
+BerghAlgorithms.stackyWeights
+BerghAlgorithms.getRayStack
+BerghAlgorithms.rootConstruction
+BerghAlgorithms.rootConstructionDistinguished
+BerghAlgorithms.rootConstructionDistinguishedIndices
+BerghAlgorithms.findStackyBarycenter
+BerghAlgorithms.findStackyRayMatrix
+BerghAlgorithms.getConesPolymake
+BerghAlgorithms.distinguishedAndIntPoint
+BerghAlgorithms.compareCones
+BerghAlgorithms.extremalCones
+BerghAlgorithms.minimalByLex
+BerghAlgorithms.minimalByDist
+BerghAlgorithms.coneRayDecomposition
+```
+
+## Visualization Helper Functions
+```@docs
+BerghAlgorithms.plot3dSimpCone
+BerghAlgorithms.plot2dCone
+BerghAlgorithms.showSimpFan
+BerghAlgorithms.showSimpStackyFan
+BerghAlgorithms.coneVectorOrder
+BerghAlgorithms.plot3dCone
 ```

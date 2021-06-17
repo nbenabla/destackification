@@ -307,7 +307,6 @@ julia> findStackyBarycenter([1,2],F)
 [ 5 ,  6 ]
 ```
 """
-
 function findStackyBarycenter(s::Union{AbstractSet,AbstractVector},SX::StackyFan)
     rayMatrix=convert(Array{Int64,2}, Array(Polymake.common.primitive(SX.fan.RAYS)))
     # Multiply the rays by their stacky values
@@ -898,8 +897,24 @@ function getCones(X::Polymake.BigObjectAllocated)
     return out
 end
 
+"""
+
+    findFaceContainingRay(::Polymake.BigObjectAllocated,::Array{Int64, 1})
+
+Given a cone and a ray, finds a maximal proper face of the cone containing that ray.
+
+# Examples
+```jldoctest StackyFan
+julia> C=Polymake.polytope.Cone(INPUT_RAYS=[1 0 0; 1 0 1; 1 1 0; 1 1 1]);
+
+julia> findFaceContainingRay(C,[1,1,1]).RAYS
+pm::Matrix<pm::Rational>
+1 0 1
+1 1 1
+```
+"""
 function findFaceContainingRay(C::Polymake.BigObjectAllocated,v::Array{Int64, 1})
-    rayMatrix=Array(C.RAYS)
+    rayMatrix=convert(Array{Int64,2},Array(Polymake.common.primitive(C.RAYS)))
     faces=convertIncidenceMatrix(C.RAYS_IN_FACETS)
     if faces==[[]]
         return nothing
@@ -913,8 +928,21 @@ function findFaceContainingRay(C::Polymake.BigObjectAllocated,v::Array{Int64, 1}
     return nothing
 end
 
+"""
+    findMinimalCone(::Polymake.BigObjectAllocated,::Array{Int64,1})
+
+Given a fan and a ray, finds the minimal cone fo the fan containing the ray.
+
+# Examples
+```jldoctest StackyFan
+julia> X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0 0; 1 0 1 0; 1 1 0 0; 1 1 1 0; 0 0 0 1],INPUT_CONES=[[0,1,2,3,4]]);
+
+julia> findMinimalCone(X,[1,2,0,0])
+[1, 3]
+```
+"""
 function findMinimalCone(X::Polymake.BigObjectAllocated,v::Array{Int64, 1})
-    rayMatrix=Array(X.RAYS)
+    rayMatrix=convert(Array{Int64,2},Array(Polymake.common.primitive(X.RAYS)))
     cones=convertIncidenceMatrix(X.MAXIMAL_CONES)
     #print(cones)
     startCone=nothing
@@ -942,6 +970,25 @@ function findMinimalCone(X::Polymake.BigObjectAllocated,v::Array{Int64, 1})
     return indices
 end
 
+"""
+    starSubdivision(::Polymake.BigObjectAllocated,::Array{Int64,1})
+
+    Blows up the input fan at the input ray. A wrapper integrating findMinimalCone and toric_blowup.
+
+# Examples
+```jldoctest StackyFan
+julia> X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0 0; 1 0 1 0; 1 1 0 0; 1 1 1 0; 0 0 0 1],INPUT_CONES=[[0,1,2,3,4]]);
+
+julia> starSubdivision(X,[2,1,0,0]).RAYS
+pm::Matrix<pm::Rational>
+1 0 0 0
+1 0 1 0
+0 0 0 1
+1 1/2 0 0
+1 1 0 0
+1 1 1 0
+```
+"""
 function starSubdivision(X::Polymake.BigObjectAllocated, v::Array{Int64, 1})
     minimalCone = findMinimalCone(X, v)
     s = [i - 1 for i in minimalCone]
@@ -1210,7 +1257,7 @@ Given a stacky fan F and a vector of booleans D representing the distinguished s
 The algorithm is adapted from Daniel Bergh's [paper on destackification](https://arxiv.org/abs/1409.5713). In brief, it identifies non-smooth cones containing at least one distinguished ray, finds interior points in those cones, and subdivides at those points through a series of stacky barycentric subdivisions.
 
 # Examples
-```jldoctest StackyFan.jl
+```jldoctest
 
 julia> X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0; 2 5],INPUT_CONES=[[0,1]]);
 
