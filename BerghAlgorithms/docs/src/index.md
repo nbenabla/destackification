@@ -13,4 +13,5 @@ This package implements toric stacky fans in Julia by extending the Oscar/Polyma
 ## Main Functions
 ```@docs
 BerghA
+BerghAlgorithms.slicematrix
 ```
