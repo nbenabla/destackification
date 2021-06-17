@@ -1257,7 +1257,7 @@ Given a stacky fan F and a vector of booleans D representing the distinguished s
 The algorithm is adapted from Daniel Bergh's [paper on destackification](https://arxiv.org/abs/1409.5713). In brief, it identifies non-smooth cones containing at least one distinguished ray, finds interior points in those cones, and subdivides at those points through a series of stacky barycentric subdivisions.
 
 # Examples
-```jldoctest
+```jldoctest StackyFan
 
 julia> X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0; 2 5],INPUT_CONES=[[0,1]]);
 
