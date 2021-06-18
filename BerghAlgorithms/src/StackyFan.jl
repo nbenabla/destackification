@@ -66,7 +66,7 @@ end
 Function to generate a stacky fan from a given fan and a set of scalars.
 
 # Examples
-```jldoctest StackyFan
+```jldoctest
 julia> X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0; 1 1; 1 2],INPUT_CONES=[[0,1],[1,2]]);
 
 julia> stackyWeights(addStackStructure(X,[2,2,2]))
