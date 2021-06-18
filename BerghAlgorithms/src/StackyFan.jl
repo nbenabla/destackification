@@ -3,6 +3,13 @@ using Polymake
 using InvertedIndices
 using Combinatorics
 using LinearAlgebra
+export slicematrix
+export makeSmooth
+export addStackStructure
+export stackyWeights
+export BerghA
+export toric_blowup
+export convertIncidenceMatrix
 
 """
 
@@ -97,7 +104,7 @@ julia> encode([1,0,2,5])
 "1,0,2,5"
 ```
 """
-function encode(::Union{Polymake.VectorAllocated{Polymake.Rational},Polymake.VectorAllocated{Polymake.Integer},Vector{Int64}})
+function encode(objects::Union{Polymake.VectorAllocated{Polymake.Rational},Polymake.VectorAllocated{Polymake.Integer},Vector{Int64}})
     return(foldl((x,y) -> string(x, ',', y), objects))
 end
 
@@ -281,15 +288,25 @@ pm::Matrix<pm::Integer>
 ```
 """
 function findBarycenter(s::Union{AbstractSet,AbstractVector},X::Polymake.BigObjectAllocated)
-    rayMatrix=convert(Array{Int64,2},Array(Polymake.common.primitive(X.RAYS)))
-    rays = rowMinors(rayMatrix, s)
+#     rayMatrix=convert(Array{Int64,2},Array(Polymake.common.primitive(X.RAYS)))
+#     rays = rowMinors(rayMatrix, s)
+#     dim=size(rays,2)
+#     bary=zeros(Int64,dim,1)
+#     for i in 1:size(rays,1)
+#         bary+=rays[i,:]
+#     end
+#     bary=Polymake.common.primitive(bary)
+#     return vec(bary)
+# end
+    
+    rays = rowMinors(Array(X.RAYS), s)
     dim=size(rays,2)
-    bary=zeros(Int64,dim,1)
+    bary=zeros(Polymake.Rational,dim,1)
     for i in 1:size(rays,1)
         bary+=rays[i,:]
     end
-    bary=Polymake.common.primitive(bary)
-    return vec(bary)
+    bary=Polymake.common.primitive(transpose(bary))
+    return bary
 end
 
 """
@@ -457,12 +474,12 @@ pm::IncidenceMatrix<pm::NonSymmetric>
 ```
 """
 function toric_blowup(s, X, v)
-    if size(v,2)==1
-         v=transpose(v)
-    end
     s = [i + 1 for i in s]
     if v==nothing
         v=findBarycenter(s,X)
+    end
+    if size(v,2)==1
+         v=transpose(v)
     end
     coneList = convertIncidenceMatrix(X.MAXIMAL_CONES)
     # Extracting the indices of all the cones in X that contains the set of rays s
