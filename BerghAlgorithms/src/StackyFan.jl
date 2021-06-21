@@ -3,13 +3,47 @@ using Polymake
 using InvertedIndices
 using Combinatorics
 using LinearAlgebra
-export slicematrix
-export makeSmooth
-export addStackStructure
-export stackyWeights
-export BerghA
+export StackyFan
 export toric_blowup
+export makeSimplicial
+export makeSmooth
+export starSubdivision
+export BerghA
+export stackyBlowup
+export showFan
+export showStackyFan
+export makeStackyFan
+export findBarycenter
+export convertBool
+export getConeRank
+export getDimension
+export getConeFaces
+export slicematrix
+export rowMinors
 export convertIncidenceMatrix
+export coneMultiplicity
+export coneConvert
+export getCones
+export findFaceContainingRay
+export findMinimalCone
+export convertToIncidence
+export interiorPoints
+export addStackStructure
+export encode
+export stackyWeights
+export getRayStack
+export rootConstruction
+export rootConstructionDistinguished
+export rootConstructionDistinguishedIndices
+export findStackyBarycenter
+export findStackyRayMatrix
+export getConesPolymake
+export distinguishedAndIntPoint
+export compareCones
+export extremalCones
+export minimalByLex
+export minimalByDist
+export coneRayDecomposition
 
 """
 
@@ -263,7 +297,7 @@ function rootConstructionDistinguished(
     # Convert the dictionary to an array of scalars matching the indices
     #newScalars = mapslices(ray -> newStacks[encode(ray)], sf.fan.RAYS, dims=2)
     newScalars = Array{Int64, 1}()
-    for i in 1:size(SX.fan.RAYS, 1)
+    for i in 1:size(sf.fan.RAYS, 1)
         push!(newScalars, newStacks[encode(sf.fan.RAYS[i,:])])
     end
     
@@ -652,7 +686,7 @@ function makeSmooth(X::Polymake.BigObjectAllocated)
     Y  = copy(X)
     while(true)
         coneList = convertIncidenceMatrix(Y.MAXIMAL_CONES)
-        rayMatrix = Array(Y.RAYS)
+        rayMatrix = Array(Polymake.common.primitive(Y.RAYS))
         k = 1
         # Iterate through the coneList, getting the index of the first cone not smooth
         for coneSet in coneList
