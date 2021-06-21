@@ -44,6 +44,15 @@ export extremalCones
 export minimalByLex
 export minimalByDist
 export coneRayDecomposition
+export plot3dSimpCone
+export plot2dCone
+export showSimpFan
+export showSimpStackyFan
+export coneVectorOrder
+export plot3dCone
+export showFan
+export showStackyFan
+
 
 """
 
@@ -403,13 +412,13 @@ Takes a column vector of boolean values and converts it to a vector of indices m
 
 #Examples
 ```jldoctest makeSmoothWithDependencies
-julia> B=[true true false true]
+julia> B=[true,true,false,true]
 
-julia> convertBool(transpose(B))
+julia> convertBool(B)
 [0, 1, 3]
 """
 function convertBool(B::AbstractVector)
-    out=[]
+    out=Int64[]
     for i in 1:size(B,1)
         if B[i]==true
            append!(out,i-1) 
@@ -576,7 +585,7 @@ end
 """
     makeSimplicial(::Polymake.BigObjectAllocated)
 
-Takes in a normal toric variety and returns a simplicial toric variety  by subdividing (blowing up) the non-simplicial maximal cones.
+Takes in a normal toric variety and returns a simplicial toric variety by subdividing (blowing up) the non-simplicial maximal cones.
 
 #Examples
 ```jldoctest makeSmoothWithDependencies
@@ -786,7 +795,7 @@ end
     
 #Examples
 ```jldoctest StackyFan
-julia> F=makeStackyFan([1 0; 1 1; 1 2; 1 3],[[0,1],[1,2],[2,3]])
+julia> F=makeStackyFan([1 0; 1 1; 1 2; 1 3],[[0,1],[1,2],[2,3]],[1,1,1,1])
     
 julia> getConesPolymake(F)[1].RAYS
 pm::Matrix<pm::Rational>
@@ -1054,7 +1063,7 @@ end
 
 # Examples
 ```jldoctest StackyFan
-julia> distinguishedAndMultiplicity([1,2,4],[1 0 0; 1 2 0;2 1 3; 1 0 3],[1,0,0,0])
+julia> distinguishedAndIntPoint([1,2,4],[1 0 0; 1 2 0;2 1 3; 1 0 3],[1,0,0,0])
 true
 ```
 """
@@ -1650,7 +1659,7 @@ julia> X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0; 2 5],INPUT_CONES=[[
 
 julia> F=addStackStructure(X,[1,2]);
 
-julia> showSimpStackyFan(F)
+julia> showSimpStackyFan(F);
 ```
 """
 function showSimpStackyFan(F::StackyFan;stackypoints::Bool=true)
@@ -1697,7 +1706,7 @@ end
 
 # Exampels
 ```jldoctest StackyFan
-julia> C=Polymake.polytope.Cone(INPUT_RAYS=[[1 0 0; 1 0 1; 0 1 1; 1 1 1]]);
+julia> C=Polymake.polytope.Cone(INPUT_RAYS=[1 0 0; 1 0 1; 1 1 0; 1 1 1]);
 
 julia> coneVectorOrder(C)
 [[1

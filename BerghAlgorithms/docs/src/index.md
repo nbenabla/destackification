@@ -51,6 +51,7 @@ BerghAlgorithms.interiorPoints
 
 ## Helper Functions for Stacky Fans
 ```@docs
+BerghAlgorithms.makeStackyFan
 BerghAlgorithms.addStackStructure
 BerghAlgorithms.encode
 BerghAlgorithms.stackyWeights
@@ -77,4 +78,6 @@ BerghAlgorithms.showSimpFan
 BerghAlgorithms.showSimpStackyFan
 BerghAlgorithms.coneVectorOrder
 BerghAlgorithms.plot3dCone
+BerghAlgorithms.showFan
+BerghAlgorithms.showStackyFan
 ```

@@ -3,7 +3,7 @@ using Polymake
 using Test
 
 
- @testset "StackyFan.jl" begin
+ @testset "StackyFan Helper Functions" begin
     @test stackyWeights(makeStackyFan([1 0; 1 1; 1 2],[[0,1],[1,2]],[2,2,2]))==[ 2 ,  2 ,  2 ]
 
     X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0; 1 1; 1 2],INPUT_CONES=[[0,1],[1,2]])
@@ -34,18 +34,113 @@ using Test
     s=[1,2];
     @test convert(Array{Int64,1},vec(Array(findBarycenter(s,X))))==[2,1]
 
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0; 1 2],INPUT_CONES=[[0,1]]);
+    F=addStackStructure(X,[2,3]);
+    @test convert(Array{Int64,1},Array(findStackyBarycenter([1,2],F)))==[5,6]
 
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0; 2 3; 1 5],INPUT_CONES=[[0,1],[1,2]]);
+    F=addStackStructure(X,[1,2,3]);
+    @test findStackyRayMatrix(F)==[1 0;4 6;3 15]
 
+    B=[true,true,false,true]
+    @test convertBool(B)==[0, 1, 3]
 
+    v=[1,2]
+    M=[0 1; 1 1; 1 0]
+    @test getConeRank(v,M)==2
 
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0;1 2 0;0 0 1;0 1 0; 1 1 1],INPUT_CONES=[[0,1,2],[0,2,3,4]])
+    @test getDimension(X)==3
 
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0; 1 1 0; 1 0 1; 1 1 1],INPUT_CONES=[[0,1,2,3]])
+    @test getConeFaces(X,[1,2,3,4],Array(X.RAYS))==[[ 1 ,  2 ], [ 1 ,  3 ], [ 3 ,  4 ], [ 2 ,  4 ]]
 
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0;1 1 0;1 0 1;1 1 1],INPUT_CONES=[[0,1,2,3]])
+    @test X.SIMPLICIAL==false
+    @test makeSimplicial(X).SIMPLICIAL==true
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0 0;0 1 0 0;0 0 1 0;1 -1 1 0; 1 0 -2 0],INPUT_CONES=[[0,1,2,3],[0,4]])
+    @test X.SIMPLICIAL==false
+    @test makeSimplicial(X).SIMPLICIAL==true
 
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0; 1 2],INPUT_CONES=[[0,1]]);
+    F=addStackStructure(X,[2,3]);
+    @test stackyWeights(stackyBlowup(F,[0,1],[1,1]))==[2,1,3]
 
+    F=makeStackyFan([1 0; 1 1; 1 2; 1 3],[[0,1],[1,2],[2,3]],[1,1,1,1])
+    @test getConesPolymake(F)[1].RAYS==[1 0; 1 1]
 
+    A=[1 2; 3 4];
+    @test slicematrix(A)==[[1,2],[3,4]]
 
+    A=[1 2 3;4 5 6; 7 8 9];
+    S=Set([1,3]);
+    @test rowMinors(A,S)==[1 2 3; 7 8 9]
 
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0;1 1; 0 1],INPUT_CONES=[[0,1],[1,2]]);
+    M=X.MAXIMAL_CONES;
+    @test convertIncidenceMatrix(M)==[[1,2],[2,3]]
 
+    C=Polymake.polytope.Cone(INPUT_RAYS=[1 0; 1 2]);
+    @test coneMultiplicity(C)==2
+
+    @test typeof(coneConvert([1, 2, 4],[1 0 0; 0 1 0; 0 0 1; 1 1 1]))==Polymake.BigObjectAllocated
+
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0; 1 1 0; 1 0 1; 1 1 1],INPUT_CONES=[[0,1,2,3]]);
+    @test Set(getCones(X))==Set([[1,2,3,4],[1,2],[1,3],[3,4],[2,4],[1],[2],[3],[4]])
+
+    C=Polymake.polytope.Cone(INPUT_RAYS=[1 0 0; 1 0 1; 1 1 0; 1 1 1]);
+    @test convert(Array{Int64,2},Array(findFaceContainingRay(C,[1,1,1]).RAYS))==[1 0 1; 1 1 1]
+
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0 0; 1 0 1 0; 1 1 0 0; 1 1 1 0; 0 0 0 1],INPUT_CONES=[[0,1,2,3,4]]);
+    @test findMinimalCone(X,[2,1,0,0])==[1,3]
+
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0 0; 1 0 1 0; 1 1 0 0; 1 1 1 0; 0 0 0 1],INPUT_CONES=[[0,1,2,3,4]]);
+    @test convert(Array{Int64,2},Array(Polymake.common.primitive(starSubdivision(X,[2,1,0,0]).RAYS)))==[1 0 0 0;1 0 1 0;0 0 0 1;2 1 0 0; 1 1 0 0; 1 1 1 0]
+
+    @test distinguishedAndIntPoint([1,2,4],[1 0 0; 1 2 0;2 1 3; 1 0 3],[1,0,0,0])==true
+
+    @test convertToIncidence([2,3,5],6)==[0,1,1,0,1,0]
+
+    @test compareCones([1,2],[2,3],[1 0 0; 0 1 0; 0 0 1],[1,1,0])==-1
+    @test compareCones([1,2],[1,3],[1 0;1 2;1 -1],[1,1,1])==1
+
+    @test extremalCones([[1,2],[2,3],[3,4]],[1 0;1 2; 1 5; 1 8],[0,1,1,0])==[[3,4]]
+
+    C=Polymake.polytope.Cone(INPUT_RAYS=[1 2; 2 1]);
+    @test interiorPoints(C)==[[1,1]]
+
+    A=[[1,1,1],[2,1,3],[0,5,4]];
+    @test minimalByLex(A)==[0,5,4]
+
+    @test minimalByDist([[0,1,5,7],[3,3,2,2],[8,5,3,6],[2,1,1,10]],[0,1,1,0])==[2,1,1,10]
+
+    @test coneRayDecomposition([1,2,3],[3 5 7; 8 16 9;2 1 3;1 1 1],[2,2,3],[1,1,1,1])==[6,5,52,0]
+
+end
+
+@testset "Visualization" begin
+    plot3dSimpCone([[1,0,0],[0,1,0],[0,0,1]]);
+
+    plot2dCone([[1,0],[0,1]]);
+
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0; 2 5],INPUT_CONES=[[0,1]]);
+    showSimpFan(X);
+
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0; 2 5],INPUT_CONES=[[0,1]]);
+    F=addStackStructure(X,[1,2]);
+    showSimpStackyFan(F);
+
+    C=Polymake.polytope.Cone(INPUT_RAYS=[1 0 0; 1 0 1; 1 1 0; 1 1 1]);
+    @test coneVectorOrder(C)==[[1,1,0],[1,1,1],[1,0,1],[1,0,0]]
+
+    plot3dCone([[1,1,0],[1,1,1],[1,0,1],[1,0,0]]);
+
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0; 1 0 1; 1 1 0; 1 1 1],INPUT_CONES=[[0,1,2,3]]);
+    showFan(X);
+
+    X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0; 1 0 1; 1 1 0; 1 1 1],INPUT_CONES=[[0,1,2,3]]);
+    F=addStackStructure(X,[1,2,2,5]);
+    showStackyFan(F);
 end
 
  @testset "BerghA.jl" begin
