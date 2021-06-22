@@ -83,6 +83,8 @@ using Test
     C=Polymake.polytope.Cone(INPUT_RAYS=[1 0; 1 2]);
     @test coneMultiplicity(C)==2
 
+    @test getMultiplicity([1,2],[1 0; 1 2; 1 3])==2   
+
     @test typeof(coneConvert([1, 2, 4],[1 0 0; 0 1 0; 0 0 1; 1 1 1]))==Polymake.BigObjectAllocated
 
     X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0; 1 1 0; 1 0 1; 1 1 1],INPUT_CONES=[[0,1,2,3]]);
@@ -247,8 +249,65 @@ end
        @test B.SIMPLICIAL == true
        @test B.SMOOTH_FAN == true
        
-    
-        
-    
+end
+
+@testset "AlgC.jl" begin
+    A=[1,2,3,4];
+    remove!(A,1);
+    @test A==[2,3,4]
+
+    @test getIndex([0,1,0],[1 0 0; 0 1 0; 0 0 1])==2
+
+    @test isIndependent(3,[1,2,3],[1 0 0; 0 1 0; 1 2 3])==false
+    @test isIndependent(3,[1,2,3],[1 0 0; 0 1 0; 1 1 1])==true
+
+    @test independencyIndex([1,2,3],[1 0 0 ; 1 2 0; 2 0 3; 0 0 5])==3
+
+    F=makeStackyFan([1 0 0; 1 2 0; 0 0 1],[[0,1,2]],[1,1,2]);
+    @test isRelevant([1,2,0],[1,2,3],F)==true
+    F=makeStackyFan([1 0 0; 0 1 0; 0 0 1],[[0,1,2]],[1,1,2]);
+    @test isRelevant([0,1,0],[1,2,3],F)==false
+
+    F=makeStackyFan([1 0 0; 0 1 0; 1 0 2],[[0,1,2]],[1,2,1]);
+    div=Dict([1,0,0]=>0,[0,1,0]=>0,[1,0,2]=>0);
+    @test toroidalIndex([1,2,3],F,div)==3
+    div=Dict([1,0,0]=>0,[0,1,0]=>0,[1,0,2]=>1);
+    @test toroidalIndex([1,2,3],F,div)==2
+
+    F=makeStackyFan([1 0 0; 0 1 0; 1 0 2],[[0,1,2]],[1,2,1]);
+    div=Dict([1,0,0]=>0,[0,1,0]=>0,[1,0,2]=>0);
+    @test divisorialIndex([1,2,3],F,div)==3
+    div=Dict([1,0,0]=>0,[0,1,0]=>0,[1,0,2]=>1);
+    @test divisorialIndex([1,2,3],F,div)==1
+
+    @test coneContains([1,2,3],[1,2,3,4])==true
+    @test coneContains([1,2,5],[1,2,3,4])==false
+
+    F=makeStackyFan([1 2 0;1 3 0; 3 0 1],[[0,1,2]],[1,1,5]);
+    div=Dict([1,2,0]=>0,[1,3,0]=>0,[3,0,1]=>0);
+    @test minMaxDivisorial(F,div)==[[3]]
+    F=makeStackyFan([1 1 0;1 3 0; 3 0 1],[[0,1,2]],[1,1,5]);
+    div=Dict([1,1,0]=>0,[1,3,0]=>0,[3,0,1]=>0);
+    @test minMaxDivisorial(F,div)==[[1,2,3]]
+
+    F=makeStackyFan([1 1 0;1 3 0; 0 0 1],[[0,1,2]],[1,1,5]);
+    H, div = BerghC(F,[0,0,0]);
+    @test convert(Array{Int64,2},Polymake.common.primitive(H.fan.RAYS))==[1 1 0; 0 0 1; 2 4 5; 1 3 0; 1 2 0]
+    @test div==Dict([1,1,0]=>0,[0,0,1]=>1,[2,4,5]=>1,[1,2,0]=>1,[1,3,0]=>0)
+
+    F=makeStackyFan([1 0;1 3; 5 17],[[0,1],[1,2]],[1,1,5]);
+    H, div = BerghC(F,[0,0,0]);
+    @test convert(Array{Int64,2},Polymake.common.primitive(H.fan.RAYS))==[1 0; 2 3; 1 3; 13 44; 5 17]
+    @test div==Dict([1,0]=>0,[13,44]=>1,[1,3]=>0,[2,3]=>1,[5,17]=>1)
+
+
+
+
+
+
+
+
+
+
 end
 

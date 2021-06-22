@@ -18,10 +18,11 @@ BerghAlgorithms.makeSmooth
 BerghAlgorithms.starSubdivision
 ```
 
-## Main Functions for Stacky Fans
+## Main Functions for Destackification
 ```@docs
-BerghA
+BerghAlgorithms.BerghA
 BerghAlgorithms.stackyBlowup
+BerghAlgorithms.BerghC
 ```
 
 ## Main Visualization Functions
@@ -68,6 +69,15 @@ BerghAlgorithms.extremalCones
 BerghAlgorithms.minimalByLex
 BerghAlgorithms.minimalByDist
 BerghAlgorithms.coneRayDecomposition
+BerghAlgorithms.remove!
+BerghAlgorithms.getIndex
+BerghAlgorithms.isIndependent
+BerghAlgorithms.independencyIndex
+BerghAlgorithms.isRelevant
+BerghAlgorithms.toroidalIndex
+BerghAlgorithms.divisorialIndex
+BerghAlgorithms.coneContains
+BerghAlgorithms.minMaxDivisorial
 ```
 
 ## Visualization Helper Functions
@@ -78,6 +88,4 @@ BerghAlgorithms.showSimpFan
 BerghAlgorithms.showSimpStackyFan
 BerghAlgorithms.coneVectorOrder
 BerghAlgorithms.plot3dCone
-BerghAlgorithms.showFan
-BerghAlgorithms.showStackyFan
 ```
