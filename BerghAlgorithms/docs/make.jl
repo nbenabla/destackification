@@ -12,3 +12,7 @@ makedocs(
         "Functions" => "functions.md"
     ]
 )
+
+deploydocs(;
+    repo="github.com/nbenabla/destackification",
+)
