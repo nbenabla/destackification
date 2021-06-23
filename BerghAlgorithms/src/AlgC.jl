@@ -22,7 +22,7 @@ export BerghC
     In-place removes a given item from a vector.
 
 # Examples
-```jldoctest AlgC
+```jldoctest
 julia> A=[1,2,3,4];
 
 julia> remove!(A,1);
@@ -41,7 +41,7 @@ end
     Returns the first index at which a vector appears as a row of a matrix.
 
 # Examples
-```jldoctest AlgC
+```jldoctest
 getIndex([0,1,0],[1 0 0; 0 1 0; 0 0 1])
 2
 ``` 
@@ -108,7 +108,7 @@ end
     Determines if the given ray, relative to the given cone, either has a stacky value greater than 1 or is not independent.
 
 # Examples
-```jldoctest AlgC
+```jldoctest
 julia> F=makeStackyFan([1 0 0; 1 2 0; 0 0 1],[[0,1,2]],[1,1,2]);
 
 julia> isRelevant([1,2,0],[1,2,3],F)
@@ -118,6 +118,7 @@ julia> F=makeStackyFan([1 0 0; 0 1 0; 0 0 1],[[0,1,2]],[1,1,2]);
 
 julia> isRelevant([0,1,0],[1,2,3],F)
 false
+```
 """
 function isRelevant(ray::Array{Int64,1},cone::Array{Int64,1},F::StackyFan)
     rayMatrix=convert(Array{Int64,2},Array(Polymake.common.primitive(F.fan.RAYS)))
@@ -137,6 +138,7 @@ end
     Calculates the toroidal index of the given cone of a divisorial stacky fan, or the number of relevant non-divisorial rays. Compare to divisorialIndex().
     
 # Examples
+```jldoctest
 julia> F=makeStackyFan([1 0 0; 0 1 0; 1 0 2],[[0,1,2]],[1,2,1]);
 
 julia> div=Dict([1,0,0]=>0,[0,1,0]=>0,[1,0,2]=>0);
@@ -147,6 +149,7 @@ julia> div=Dict([1,0,0]=>0,[0,1,0]=>0,[1,0,2]=>1);
     
 julia> toroidalIndex([1,2,3],F,div)
 2
+```
 """
 function toroidalIndex(cone::Array{Int64,1},F::StackyFan,div::Dict)
     rayMatrix=convert(Array{Int64,2},Array(Polymake.common.primitive(F.fan.RAYS)))
@@ -170,6 +173,7 @@ end
     Calculates the divisorial index (defined by Daniel Bergh) of a given cone in a fan with divisorial rays. Specifically, takes the subcone consisting of all relevant non-divisorial rays in a cone, and counts the number of rays that are relevant in that subcone.
 
 # Examples
+```jldoctest
 julia> F=makeStackyFan([1 0 0; 0 1 0; 1 0 2],[[0,1,2]],[1,2,1]);
 
 julia> div=Dict([1,0,0]=>0,[0,1,0]=>0,[1,0,2]=>0);
@@ -180,6 +184,7 @@ julia> div=Dict([1,0,0]=>0,[0,1,0]=>0,[1,0,2]=>1);
     
 julia> divisorialIndex([1,2,3],F,div)
 1
+```
 """
 function divisorialIndex(cone::Array{Int64,1},F::StackyFan,div::Dict)
     slicedRayMatrix=slicematrix(convert(Array{Int64,2},Array(Polymake.common.primitive(F.fan.RAYS))))
@@ -218,10 +223,12 @@ end
     Checks whether every index in the first input is also contained in the second input. 
     
 # Examples
+``` jldoctest
 julia> coneContains([1,2,3],[1,2,3,4])
 true
 julia> coneContains([1,2,5],[1,2,3,4])
 false
+```
 """
 function coneContains(A::Array{Int64,1},B::Array{Int64,1})
     out=true
@@ -239,7 +246,7 @@ end
     Calculates the maximal divisorial index of all cones in a stacky fan. Each maximal cone of the fan will contain at most one minimal subcone of maximal divisorial index; a list of such cones is returned.
 
 # Examples
-```jldoctest AlgC
+```jldoctest
 julia> F=makeStackyFan([1 2 0;1 3 0; 3 0 1],[[0,1,2]],[1,1,5]);
     
 julia> div=Dict([1,2,0]=>0,[1,3,0]=>0,[3,0,1]=>0);
@@ -253,7 +260,7 @@ julia> div=Dict([1,1,0]=>0,[1,3,0]=>0,[3,0,1]=>0);
     
 julia> minMaxDivisorial(F,div)
 [[1,2,3]]
-    
+```
 """ 
 function minMaxDivisorial(F::StackyFan,div::Dict)
     divMax=0
@@ -302,7 +309,7 @@ end
     Takes a stacky fan and a binary array indicating which rays are divisorial, and runs Daniel Bergh's algorithm C. This algorithm performs a series of stacky blowups to reduce the maximal divisorial index of the fan, and returns a fan with a maximal divisorial index of 0.
 
 # Examples
-```jldoctest AlgC
+```jldoctest
 julia> F=makeStackyFan([1 1 0;1 3 0; 0 0 1],[[0,1,2]],[1,1,5]);
     
 julia> H, div = BerghC(F,[0,0,0]);
@@ -341,6 +348,7 @@ Dict{Any, Any} with 5 entries:
   [1, 3]   => 0
   [2, 3]   => 1
   [5, 17]  => 1
+```
 """ 
 function BerghC(F::StackyFan,divlist::Array{Int64,1})
     X=deepcopy(F)

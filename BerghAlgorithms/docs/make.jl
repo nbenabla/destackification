@@ -4,6 +4,9 @@ push!(LOAD_PATH,"../src/")
 
 using BerghAlgorithms
 
+DocMeta.setdocmeta!(BerghAlgorithms, :DocTestSetup, :(using BerghAlgorithms); recursive = true)
+
+
 makedocs(
     modules=[BerghAlgorithms],
     sitename="Bergh Documentation",
