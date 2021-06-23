@@ -58,7 +58,7 @@ end
     Takes a ray matrix, a list of indices representing a cone, and an index represeting a ray of that cone. Determines whether the given ray is independent in the cone (i.e. does not contribute to the multiplicity of the cone).
 
 # Examples
-```jldoctest AlgC
+```jldoctest
 julia> isIndependent(3,[1,2,3],[1 0 0; 0 1 0; 1 2 3])
 false
 
