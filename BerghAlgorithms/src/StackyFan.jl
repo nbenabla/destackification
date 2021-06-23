@@ -418,6 +418,7 @@ julia> B=[true,true,false,true]
 
 julia> convertBool(B)
 [0, 1, 3]
+```
 """
 function convertBool(B::AbstractVector)
     out=Int64[]
@@ -443,6 +444,7 @@ julia> M=[0 1; 1 1; 1 0]
 
 julia> getConeRank(v,M)
 2
+```
 """
 function getConeRank(coneRayIndices::AbstractVector, rayMatrix::AbstractMatrix)
     coneRays = rowMinors(rayMatrix,coneRayIndices)
@@ -460,6 +462,7 @@ julia> X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0;1 2 0;0 0 1;0 1 0;
 
 julia> getDimension(X)
 3
+```
 """
 function getDimension(X)
     return size(X.RAYS, 2)
@@ -476,6 +479,7 @@ julia> X=Polymake.fulton.NormalToricVariety(INPUT_RAYS=[1 0 0; 1 1 0; 1 0 1; 1 1
 
 julia> getConeFaces(X,[1,2,3,4],Array(X.RAYS))
 [[ 1 ,  2 ], [ 1 ,  3 ], [ 3 ,  4 ], [ 2 ,  4 ]]
+```
 """
 function getConeFaces(fan::Polymake.BigObjectAllocated,cone::AbstractVector,rayMatrix::AbstractMatrix)
     lattice = fan.HASSE_DIAGRAM
@@ -606,6 +610,7 @@ false
 
 julia> makeSimplicial(X).SIMPLICIAL
 true
+```
 """
 function makeSimplicial(X::Polymake.BigObjectAllocated)
     Y = copy(X)
@@ -692,6 +697,7 @@ false
 
 julia> makeSmooth(X).SMOOTH_FAN
 true
+```
 """
 function makeSmooth(X::Polymake.BigObjectAllocated)
     Y  = copy(X)
