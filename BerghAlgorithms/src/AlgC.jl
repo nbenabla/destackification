@@ -154,23 +154,31 @@ julia> toroidalIndex([1,2,3],F,div)
 function toroidalIndex(cone::Array{Int64,1},F::StackyFan,div::Dict)
     rayMatrix=convert(Array{Int64,2},Array(Polymake.common.primitive(F.fan.RAYS)))
     slice=slicematrix(rayMatrix)
+    # Find number of divisorial rays 
+    # div is a dictionary that represents which rays are divisorial, 0 represents a non-divisorial ray and 1 represents a divisorial ray
     s=count(x->div[slice[x]]==1,cone)
+    # number of irrelevant rays?
     flipt=0
     for i in cone
+        # Check if cone is non-divisorial
         if div[slice[i]]==0
+            # If the ray is non-divisorial and irrelevant, increment the flipt count by one.
             if isRelevant(slice[i],cone,F)==false
                 flipt+=1
             end
         end
     end
+    # number of relevant cones
     t=size(cone,1)-flipt
+    # return the toroidal index, which is the number of relevant residual (non-divisorial) rays
     return t-s
 end
     
 """
     divisorialIndex(::Array{Int64,1},::StackyFan,::Dict)
 
-    Calculates the divisorial index (defined by Daniel Bergh) of a given cone in a fan with divisorial rays. Specifically, takes the subcone consisting of all relevant non-divisorial rays in a cone, and counts the number of rays that are relevant in that subcone.
+    Calculates the divisorial index (defined by Daniel Bergh) of a given cone in a fan with divisorial rays. 
+    Specifically, takes the subcone consisting of all relevant non-divisorial rays in a cone, and counts the number of rays that are relevant in that subcone.
 
 # Examples
 ```jldoctest
@@ -190,10 +198,12 @@ function divisorialIndex(cone::Array{Int64,1},F::StackyFan,div::Dict)
     slicedRayMatrix=slicematrix(convert(Array{Int64,2},Array(Polymake.common.primitive(F.fan.RAYS))))
     relRes=Array{Int64,1}[]
     relResStack=Int64[]
+    # Number of non-divisorial relevant cones?
     c=0
     for i in cone
         ray=slicedRayMatrix[i]
         stack=F.stacks[encode(ray)]
+        # If the ray is non-divisorial and relevant, increment c by one, add ray to relRes, and stack to relResStack
         if div[ray]==0 && isRelevant(ray,cone,F)==true
             c+=1
             push!(relRes,ray)
@@ -203,6 +213,7 @@ function divisorialIndex(cone::Array{Int64,1},F::StackyFan,div::Dict)
     if c==0
         return 0
     else
+        # 0-indexing
         relResIndz=[[i-1 for i in 1:c]]
         relResInd=[i for i in 1:c]
         relResCat=Array{Int64}(transpose(hcat(relRes...)))
