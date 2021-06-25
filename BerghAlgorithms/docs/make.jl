@@ -12,7 +12,8 @@ makedocs(
     sitename="Bergh Documentation",
     pages = [
         "Home" => "index.md",
-        "Functions" => "functions.md"
+        "Functions" => "functions.md",
+        "Contributors" => "contributors.md"
     ]
 )
 

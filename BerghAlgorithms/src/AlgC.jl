@@ -15,7 +15,6 @@ export minMaxDivisorial
 export BerghC
 
 
-
 """
     remove!(::Array{Int64},::Int64)
 
@@ -74,12 +73,7 @@ function isIndependent(rayIndex::Int64,cone::Array{Int64,1},rayMatrix::Array{Int
     subcone=remove!(scone,rayIndex)
     mult=getMultiplicity(cone,rayMatrix)
     submult=getMultiplicity(subcone,rayMatrix)
-        # note: replace if-else statement with "return mult == sumult" ?
-    if mult==submult
-        return true
-    else
-        return false
-    end
+    return mult==submult
 end
     
 """
@@ -96,8 +90,7 @@ julia> independencyIndex([1,2,3],[1 0 0 ; 1 2 0; 2 0 3; 0 0 5])
 function independencyIndex(cone::Array{Int64,1},rayMatrix::Array{Int64,2})
     index=0
     for elt in cone
-        #note: change == false to !isIndependent?
-        if isIndependent(elt,cone,rayMatrix)==false
+        if !isIndependent(elt,cone,rayMatrix)
             index+=1
         end
     end
@@ -127,14 +120,7 @@ function isRelevant(ray::Array{Int64,1},cone::Array{Int64,1},F::StackyFan)
     rayStack=F.stacks[encode(ray)]
     rayIndex=getIndex(ray,rayMatrix)
     rayIndependent=isIndependent(rayIndex,cone,rayMatrix)
-    #note: replace == false with !rayIndependent?
-        # note: maybe can even replace entire if-else statement with : "return rayStack != 1 || !rayIndependent" 
-                                                                        # ^^ this is a boolean statement whose truth value is the same as what the if-else is doing I think
-    if rayStack != 1 || rayIndependent == false
-        return true
-    else
-        return false
-    end
+    return rayStack != 1 || !rayIndependent
 end
     
 """
@@ -162,14 +148,12 @@ function toroidalIndex(cone::Array{Int64,1},F::StackyFan,div::Dict)
     # Find number of divisorial rays 
     # div is a dictionary that represents which rays are divisorial, 0 represents a non-divisorial ray and 1 represents a divisorial ray
     s=count(x->div[slice[x]]==1,cone)
-    # number of irrelevant rays?
+    #flipt counts the number of non-divisorial and irrelevant rays
     flipt=0
     for i in cone
         # Check if cone is non-divisorial
         if div[slice[i]]==0
-            # If the ray is non-divisorial and irrelevant, increment the flipt count by one.
-            # note: might be able to replace == false with !isRelevant
-            if isRelevant(slice[i],cone,F)==false
+            if !isRelevant(slice[i],cone,F)
                 flipt+=1
             end
         end
@@ -205,14 +189,13 @@ function divisorialIndex(cone::Array{Int64,1},F::StackyFan,div::Dict)
     # relevant residual cones
     relRes=Array{Int64,1}[]
     relResStack=Int64[]
-    # Number of non-divisorial relevant cones?
+    # c is the number of non-divisorial relevant cones
     c=0
     for i in cone
         ray=slicedRayMatrix[i]
         stack=F.stacks[encode(ray)]
-        # If the ray is non-divisorial and relevant, increment c by one, add ray to relRes, and stack to relResStack
-        # note: == true, probably unnecessary
-        if div[ray]==0 && isRelevant(ray,cone,F)==true
+        # If the ray is non-divisorial and relevant, increment c by one, add ray to relRes, and stack to relResStack. The rays in relRes are used to build a new cone.
+        if div[ray]==0 && isRelevant(ray,cone,F)
             c+=1
             push!(relRes,ray)
             push!(relResStack,stack)
@@ -222,7 +205,7 @@ function divisorialIndex(cone::Array{Int64,1},F::StackyFan,div::Dict)
     if c==0
         return 0
     else
-        # convert to 0-indexing?
+        # convert to 0-indexing
         relResIndz=[[i-1 for i in 1:c]]
         relResInd=[i for i in 1:c]
         relResCat=Array{Int64}(transpose(hcat(relRes...)))
@@ -232,8 +215,7 @@ function divisorialIndex(cone::Array{Int64,1},F::StackyFan,div::Dict)
         for ray in relRes
             # Iterate over relevant residual cones to count the number of relevant rays in the subfan
             # This count represents the divisorial index
-            # note: remove '== true'
-            if isRelevant(ray,relResInd,subfan)==true
+            if isRelevant(ray,relResInd,subfan)
                 divInd+=1
             end
         end
@@ -255,13 +237,12 @@ false
 ```
 """
 function coneContains(A::Array{Int64,1},B::Array{Int64,1})
-    out=true
     for i in A
         if !(i in B)
-            out=false
+            return false
         end
     end
-    return out
+    return true
 end
     
 """
@@ -288,6 +269,7 @@ julia> minMaxDivisorial(F,div)
 ```
 """ 
 function minMaxDivisorial(F::StackyFan,div::Dict)
+
     divMax=0
     coneList=getCones(F.fan)
     # dictionary that represents each cone with its divisorial index
@@ -302,6 +284,7 @@ function minMaxDivisorial(F::StackyFan,div::Dict)
     if divMax==0
         return nothing
     end
+
     # cones with maximal divisorial index
     divMaxCones=Array{Int64,1}[]
     for cone in coneList
@@ -310,21 +293,19 @@ function minMaxDivisorial(F::StackyFan,div::Dict)
             push!(divMaxCones,cone)
         end
     end
-    #not sure what this is for? vv 
+
+    #divMaxConesRefined stores the cones in divMaxCones that are minimal with respect to inclusion
     divMaxConesRefined=Array{Int64,1}[]
     # List of maximal cones in F
     maxconeList=convertIncidenceMatrix(F.fan.MAXIMAL_CONES)
     for maxcone in maxconeList
-        # if the div index of the current maxcone is the fan's max div index...? 
+        # if the div index of the current maxcone is the fan's max div index, its minimal subcone with maximal divisorial index is calculated
         if divisorialDict[maxcone]==divMax
             maxconeContains=Array{Int64,1}[]
             mincone=maxcone
             for cone in divMaxCones
-                # note: why not have this as an AND statement rather than a nested if
-                if coneContains(cone,maxcone)==true
-                    if size(cone,1)<size(mincone,1)
-                        mincone=cone
-                    end
+                if coneContains(cone,maxcone) && size(cone,1)<size(mincone,1)
+                    mincone=cone
                 end
             end
             if !(mincone in divMaxConesRefined)

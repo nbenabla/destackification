@@ -10,16 +10,4 @@ This package implements toric stacky fans in Julia by extending the Oscar/Polyma
 - Visualization of stacky fans in two and three dimensions.
 - ???
 
-## Authors
 
-- Dan Abramovich, L. Herbert Ballou University Professor, Brown University
-- Lars Kastner, Postdoctoral Researcher, Institute of Mathematics of the Technical University of Berlin
-- Stephen Obinna, Graduate Student, Brown University
-- Nada Benabla, Undergraduate, Brown University
-- Dhruv Bhatia, Undergraduate, Brown University
-- Chen Li, Undergraduate, Brown University
-- Daniel Li, Undergraduate, Brown University
-- Davis Lister, Undergraduate, Brown University
-- Danny Silverston, Undergraduate, Brown University
-- Henry Talbott, Graduate Student, University of Michigan
-- Jeremy Wang, Undergraduate, Brown University
