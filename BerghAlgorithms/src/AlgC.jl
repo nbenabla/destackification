@@ -74,6 +74,7 @@ function isIndependent(rayIndex::Int64,cone::Array{Int64,1},rayMatrix::Array{Int
     subcone=remove!(scone,rayIndex)
     mult=getMultiplicity(cone,rayMatrix)
     submult=getMultiplicity(subcone,rayMatrix)
+        # note: replace if-else statement with "return mult == sumult" ?
     if mult==submult
         return true
     else
@@ -95,6 +96,7 @@ julia> independencyIndex([1,2,3],[1 0 0 ; 1 2 0; 2 0 3; 0 0 5])
 function independencyIndex(cone::Array{Int64,1},rayMatrix::Array{Int64,2})
     index=0
     for elt in cone
+        #note: change == false to !isIndependent?
         if isIndependent(elt,cone,rayMatrix)==false
             index+=1
         end
@@ -125,6 +127,9 @@ function isRelevant(ray::Array{Int64,1},cone::Array{Int64,1},F::StackyFan)
     rayStack=F.stacks[encode(ray)]
     rayIndex=getIndex(ray,rayMatrix)
     rayIndependent=isIndependent(rayIndex,cone,rayMatrix)
+    #note: replace == false with !rayIndependent?
+        # note: maybe can even replace entire if-else statement with : "return rayStack != 1 || !rayIndependent" 
+                                                                        # ^^ this is a boolean statement whose truth value is the same as what the if-else is doing I think
     if rayStack != 1 || rayIndependent == false
         return true
     else
@@ -163,6 +168,7 @@ function toroidalIndex(cone::Array{Int64,1},F::StackyFan,div::Dict)
         # Check if cone is non-divisorial
         if div[slice[i]]==0
             # If the ray is non-divisorial and irrelevant, increment the flipt count by one.
+            # note: might be able to replace == false with !isRelevant
             if isRelevant(slice[i],cone,F)==false
                 flipt+=1
             end
@@ -196,6 +202,7 @@ julia> divisorialIndex([1,2,3],F,div)
 """
 function divisorialIndex(cone::Array{Int64,1},F::StackyFan,div::Dict)
     slicedRayMatrix=slicematrix(convert(Array{Int64,2},Array(Polymake.common.primitive(F.fan.RAYS))))
+    # relevant residual cones
     relRes=Array{Int64,1}[]
     relResStack=Int64[]
     # Number of non-divisorial relevant cones?
@@ -204,22 +211,28 @@ function divisorialIndex(cone::Array{Int64,1},F::StackyFan,div::Dict)
         ray=slicedRayMatrix[i]
         stack=F.stacks[encode(ray)]
         # If the ray is non-divisorial and relevant, increment c by one, add ray to relRes, and stack to relResStack
+        # note: == true, probably unnecessary
         if div[ray]==0 && isRelevant(ray,cone,F)==true
             c+=1
             push!(relRes,ray)
             push!(relResStack,stack)
         end
     end
+    # If there are no relevant residual cones in F, the divisorial index is 0
     if c==0
         return 0
     else
-        # 0-indexing
+        # convert to 0-indexing?
         relResIndz=[[i-1 for i in 1:c]]
         relResInd=[i for i in 1:c]
         relResCat=Array{Int64}(transpose(hcat(relRes...)))
+        # Construct a subfan consisting of all relevant residual rays
         subfan=makeStackyFan(relResCat,relResIndz,relResStack)
         divInd=0
         for ray in relRes
+            # Iterate over relevant residual cones to count the number of relevant rays in the subfan
+            # This count represents the divisorial index
+            # note: remove '== true'
             if isRelevant(ray,relResInd,subfan)==true
                 divInd+=1
             end
@@ -254,7 +267,8 @@ end
 """
     minMaxDivisorial(::StackyFan,::Dict)
     
-    Calculates the maximal divisorial index of all cones in a stacky fan. Each maximal cone of the fan will contain at most one minimal subcone of maximal divisorial index; a list of such cones is returned.
+    Calculates the maximal divisorial index of all cones in a stacky fan. 
+    Each maximal cone of the fan will contain at most one minimal subcone of maximal divisorial index; a list of such cones is returned.
 
 # Examples
 ```jldoctest
@@ -276,6 +290,7 @@ julia> minMaxDivisorial(F,div)
 function minMaxDivisorial(F::StackyFan,div::Dict)
     divMax=0
     coneList=getCones(F.fan)
+    # dictionary that represents each cone with its divisorial index
     divisorialDict=Dict()
     for cone in coneList
         d=divisorialIndex(cone,F,div)
@@ -287,19 +302,25 @@ function minMaxDivisorial(F::StackyFan,div::Dict)
     if divMax==0
         return nothing
     end
+    # cones with maximal divisorial index
     divMaxCones=Array{Int64,1}[]
     for cone in coneList
         if divisorialDict[cone]==divMax
+             # if the cone's divisorial index is the fan's maximal divisorial index, add the cone to divMaxCones
             push!(divMaxCones,cone)
         end
     end
+    #not sure what this is for? vv 
     divMaxConesRefined=Array{Int64,1}[]
+    # List of maximal cones in F
     maxconeList=convertIncidenceMatrix(F.fan.MAXIMAL_CONES)
     for maxcone in maxconeList
+        # if the div index of the current maxcone is the fan's max div index...? 
         if divisorialDict[maxcone]==divMax
             maxconeContains=Array{Int64,1}[]
             mincone=maxcone
             for cone in divMaxCones
+                # note: why not have this as an AND statement rather than a nested if
                 if coneContains(cone,maxcone)==true
                     if size(cone,1)<size(mincone,1)
                         mincone=cone
@@ -392,6 +413,7 @@ function BerghC(F::StackyFan,divlist::Array{Int64,1})
             else
                 exceptional=findStackyBarycenter(cone,X)
                 X=stackyBlowup(X,[x-1 for x in cone], exceptional)
+                # convert exceptional ray in its primitive form
                 primExcep=Array{Int64,1}(Polymake.common.primitive(exceptional))
                 div[primExcep]=1
             end
