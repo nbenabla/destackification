@@ -319,7 +319,8 @@ end
 """
     BerghC(::StackyFan,::Array{Int64,1})
     
-    Takes a stacky fan and a binary array indicating which rays are divisorial, and runs Daniel Bergh's algorithm C. This algorithm performs a series of stacky blowups to reduce the maximal divisorial index of the fan, and returns a fan with a maximal divisorial index of 0.
+    Takes a stacky fan and a binary array indicating which rays are divisorial, and runs Daniel Bergh's algorithm C. 
+    This algorithm performs a series of stacky blowups to reduce the maximal divisorial index of the fan, and returns a fan with a maximal divisorial index of 0.
 
 # Examples
 ```jldoctest
@@ -368,18 +369,23 @@ function BerghC(F::StackyFan,divlist::Array{Int64,1})
     rayMatrix=convert(Array{Int64,2},Array(Polymake.common.primitive(X.fan.RAYS)))
     slicedRayMatrix=slicematrix(rayMatrix)
     div=Dict()
+    # Populate dictionary of divisorial rays (div) from divlist
     for i in 1:size(slicedRayMatrix,1)
         div[slicedRayMatrix[i]]=divlist[i]
     end
     while(true)
         rayMatrix=convert(Array{Int64,2},Array(Polymake.common.primitive(X.fan.RAYS)))
         slicedRayMatrix=slicematrix(rayMatrix)
+        # Find the cones with maximal divisorial index in X
         subdivTargetCones=minMaxDivisorial(X,div)
+        # If there are no such cones, the algorithm terminates
         if subdivTargetCones==nothing
             break
         end
         blowupList=Array{Array{Int64,1},1}[]
+        # Iterate through cones with maximal divisorial index
         for cone in subdivTargetCones
+            # Add each cone's ray representation to blowupList
             push!(blowupList,slicematrix(rowMinors(rayMatrix,cone)))
         end
         for raycone in blowupList
@@ -388,13 +394,15 @@ function BerghC(F::StackyFan,divlist::Array{Int64,1})
             for ray in raycone
                 push!(indices,findall(x->x==ray,slicedRayMatrix)[1])
             end
+            # Sort indices in ascending order
             cone=sort(indices)
             if size(cone,1)==1
                 div[slicedRayMatrix[cone[1]]]=1
             else
                 exceptional=findStackyBarycenter(cone,X)
+                # perform the blowup
                 X=stackyBlowup(X,[x-1 for x in cone], exceptional)
-                # convert exceptional ray in its primitive form
+                # convert exceptional ray to its primitive form
                 primExcep=Array{Int64,1}(Polymake.common.primitive(exceptional))
                 div[primExcep]=1
             end
