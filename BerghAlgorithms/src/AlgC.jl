@@ -1,17 +1,5 @@
-using Oscar
-using Polymake
-using InvertedIndices
-using Combinatorics
-using LinearAlgebra
-export remove!
-export getIndex
-export isIndependent
-export independencyIndex
-export isRelevant
-export toroidalIndex
-export divisorialIndex
-export coneContains
-export minMaxDivisorial
+export isIndependent, isRelevant
+export independencyIndex, toroidalIndex, divisorialIndex, minMaxDivisorial
 export BerghC
 
 
@@ -47,8 +35,8 @@ getIndex([0,1,0],[1 0 0; 0 1 0; 0 0 1])
 """
 function getIndex(ray::Array{Int64,1},rayMatrix::Array{Int64,2})
     slice=slicematrix(rayMatrix)
-    index=findall(x->x==ray,slice)
-    return index[1]
+    index=findfirst(x->x==ray,slice)
+    return index
 end
     
 """
@@ -88,13 +76,7 @@ julia> independencyIndex([1,2,3],[1 0 0 ; 1 2 0; 2 0 3; 0 0 5])
 ```
 """
 function independencyIndex(cone::Array{Int64,1},rayMatrix::Array{Int64,2})
-    index=0
-    for elt in cone
-        if !isIndependent(elt,cone,rayMatrix)
-            index+=1
-        end
-    end
-    return index
+    return count(elt -> !isIndependent(elt, cone, rayMatrix), cone)
 end
     
 """
@@ -149,15 +131,7 @@ function toroidalIndex(cone::Array{Int64,1},F::StackyFan,div::Dict)
     # div is a dictionary that represents which rays are divisorial, 0 represents a non-divisorial ray and 1 represents a divisorial ray
     s=count(x->div[slice[x]]==1,cone)
     #flipt counts the number of non-divisorial and irrelevant rays
-    flipt=0
-    for i in cone
-        # Check if cone is non-divisorial
-        if div[slice[i]]==0
-            if !isRelevant(slice[i],cone,F)
-                flipt+=1
-            end
-        end
-    end
+    flipt = count(i -> div[slice[i]]==0 && !isRelevant(slice[i], cone, F), cone)
     # number of relevant cones
     t=size(cone,1)-flipt
     # return the toroidal index, which is the number of relevant residual (non-divisorial) rays
@@ -229,7 +203,7 @@ end
     Checks whether every index in the first input is also contained in the second input. 
     
 # Examples
-``` jldoctest
+```jldoctest
 julia> coneContains([1,2,3],[1,2,3,4])
 true
 julia> coneContains([1,2,5],[1,2,3,4])
@@ -237,12 +211,7 @@ false
 ```
 """
 function coneContains(A::Array{Int64,1},B::Array{Int64,1})
-    for i in A
-        if !(i in B)
-            return false
-        end
-    end
-    return true
+    return issubset(A, B)
 end
     
 """
@@ -269,7 +238,7 @@ julia> minMaxDivisorial(F,div)
 ```
 """ 
 function minMaxDivisorial(F::StackyFan,div::Dict)
-
+    # Calculates the maximal divisorial index of any cone in the fan
     divMax=0
     coneList=getCones(F.fan)
     # dictionary that represents each cone with its divisorial index
