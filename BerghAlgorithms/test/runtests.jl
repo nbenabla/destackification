@@ -279,7 +279,10 @@ end
     @test divisorialIndex([1,2,3],F,div)==3
     div=Dict([1,0,0]=>0,[0,1,0]=>0,[1,0,2]=>1);
     @test divisorialIndex([1,2,3],F,div)==1
-
+    H, div = BerghC(F,[0,0,0]);
+    @test convert(Array{Int64,2},Polymake.common.primitive(H.fan.RAYS))== [1 0 0; 0 1 0; 1 1 1; 1 0 2; 1 0 1]
+    @test div == Dict([1, 1, 1] => 1, [1, 0, 0] => 0, [1, 0, 1] => 1, [0, 1, 0] => 1, [1, 0, 2] => 0)
+    
     @test coneContains([1,2,3],[1,2,3,4])==true
     @test coneContains([1,2,5],[1,2,3,4])==false
 
@@ -299,15 +302,37 @@ end
     H, div = BerghC(F,[0,0,0]);
     @test convert(Array{Int64,2},Polymake.common.primitive(H.fan.RAYS))==[1 0; 2 3; 1 3; 13 44; 5 17]
     @test div==Dict([1,0]=>0,[13,44]=>1,[1,3]=>0,[2,3]=>1,[5,17]=>1)
-
-
-
-
-
-
-
-
-
-
+    
+    F=makeStackyFan([1 0;1 3],[[0,1]],[1,1]);
+    H, div = BerghC(F,[0,0,0]);
+    @test convert(Array{Int64,2},Polymake.common.primitive(H.fan.RAYS))==[1 0; 2 3; 1 3]
+    @test div==Dict([1,0]=>0,[1,3]=>0,[2,3]=>1)
+    
+    H, div = BerghC(F, [1,1,1]);
+    @test convert(Array{Int64,2},Polymake.common.primitive(H.fan.RAYS))==[1 0; 1 3]
+    @test div==Dict([1,0]=>1,[1,3]=>1)
+    
+    F=makeStackyFan([1 0;1 3],[[0,1]],[3,3]);
+    H, div = BerghC(F,[0,0,0]);
+    @test convert(Array{Int64,2},Polymake.common.primitive(H.fan.RAYS))==[1 0; 2 3; 1 3]
+    @test div==Dict([1, 0] => 1, [1, 3] => 1, [2, 3] => 1)
+    
+    
+    F=makeStackyFan([0 0 1;1 0 0; 1 3 0],[[0,1,2]],[1,1,1]);
+    H, div = BerghC(F,[0,0,0]);
+    @test convert(Array{Int64,2},Polymake.common.primitive(H.fan.RAYS))==[0 0 1; 1 0 0; 2 3 0; 1 3 0]
+    @test div==Dict([0, 0, 1] => 0, [2, 3, 0] => 1, [1, 0, 0] => 0, [1, 3, 0] => 0)
+    
+    F=makeStackyFan([0 0 1;1 0 0; 1 3 0],[[0,1,2]],[1,2,5]);
+    H, div = BerghC(F,[0,0,0]);
+    @test convert(Array{Int64,2},Polymake.common.primitive(H.fan.RAYS))==[0 0 1; 1 0 0; 7 15 0; 1 3 0]
+    @test div==Dict([7, 15, 0] => 1, [0, 0, 1] => 0, [1, 0, 0] => 1, [1, 3, 0] => 1)
+    
+    F = makeStackyFan([1 0; 1 1; 1 2],[[0,1],[1,2]],[2,2,2]);
+    H, div = BerghC(F,[0,0,0]);
+    @test convert(Array{Int64,2},Polymake.common.primitive(H.fan.RAYS)) ==[1 0; 2 1; 1 1; 2 3; 1 2]
+    @test div==Dict([1, 0] => 1, [1, 2] => 1, [2, 1] => 1, [1, 1] => 1, [2, 3] => 1)
+    
+    
 end
 

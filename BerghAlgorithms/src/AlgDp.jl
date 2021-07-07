@@ -95,5 +95,3 @@ function positiveDivIndexCone(divisor::Array{Int64,1}, F::StackyFan, div::Dict)
     end
     return false
 end
-
-function 

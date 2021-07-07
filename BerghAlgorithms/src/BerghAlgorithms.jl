@@ -2,7 +2,7 @@ module BerghAlgorithms
 include("StackyFan.jl")
 include("AlgA.jl")
 include("AlgC.jl")
-include("AlgDp.jl")
+# include("AlgDp.jl")
 
 function __init__()
 
@@ -13,8 +13,5 @@ function __init__()
     println("-------  | If you find an issue, please consider reporting it to htalbott@umich.edu.")
 
 end
-
-# Write your package code here.
-
 
 end

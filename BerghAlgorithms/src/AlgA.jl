@@ -1,3 +1,4 @@
+export convertBool, compareCones, extremalCones, distinguishedAndIntPoint, minimalByLex, minimalByDist
 export BerghA
 
 """

@@ -1,5 +1,6 @@
 export isIndependent, isRelevant
 export independencyIndex, toroidalIndex, divisorialIndex, minMaxDivisorial
+export remove!, getIndex, coneContains
 export BerghC
 
 
